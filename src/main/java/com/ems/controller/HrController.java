@@ -8,12 +8,14 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Random;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api/hr")
+@CrossOrigin(origins = {
+        "http://localhost:5173",  // React dev
+        "http://localhost:9090"   // Frontend deployed in Tomcat / Docker
+})
 public class HrController {
 
     @Autowired
@@ -31,6 +33,7 @@ public class HrController {
         hr.setGender(userData.getOrDefault("gender", ""));
         hr.setJoinDate(LocalDate.now());
         hr.setStatus("pending");
+
         if (hrRepository.findByEmail(hr.getEmail()).isPresent()) {
             throw new RuntimeException("Email already exists");
         }
