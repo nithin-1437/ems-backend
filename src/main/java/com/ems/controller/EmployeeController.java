@@ -8,12 +8,14 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Random;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api/employees")
+@CrossOrigin(origins = {
+        "http://localhost:5173",  // React dev server
+        "http://localhost:9090"   // Deployed frontend (Tomcat / Nginx / Docker)
+})
 public class EmployeeController {
 
     @Autowired
@@ -32,6 +34,7 @@ public class EmployeeController {
         emp.setDepartment(userData.get("department"));
         emp.setJoinDate(LocalDate.now());
         emp.setStatus("pending");
+
         if (employeeRepository.findByEmail(emp.getEmail()).isPresent()) {
             throw new RuntimeException("Email already exists");
         }
@@ -66,12 +69,15 @@ public class EmployeeController {
     // Approve employee
     @PostMapping("/approve/{id}")
     public Employee approveEmployee(@PathVariable Long id) {
-        Employee emp = employeeRepository.findById(id).orElseThrow(() -> new RuntimeException("Employee not found"));
+        Employee emp = employeeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+
         if ("pending".equals(emp.getStatus())) {
             String empId = generateUnique4DigitId();
             emp.setEmpId(empId);
             emp.setStatus("approved");
             employeeRepository.save(emp);
+
             sendSms(emp.getMobile(), "Your Employee ID is " + empId + ". Use it to login.");
         }
         return emp;
@@ -92,7 +98,9 @@ public class EmployeeController {
     // Update employee
     @PutMapping("/{id}")
     public Employee updateEmployee(@PathVariable Long id, @RequestBody Employee updatedEmp) {
-        Employee emp = employeeRepository.findById(id).orElseThrow(() -> new RuntimeException("Employee not found"));
+        Employee emp = employeeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+
         emp.setName(updatedEmp.getName());
         emp.setUsername(updatedEmp.getUsername());
         emp.setPassword(updatedEmp.getPassword());
@@ -103,6 +111,7 @@ public class EmployeeController {
         emp.setPosition(updatedEmp.getPosition());
         emp.setJoinDate(updatedEmp.getJoinDate());
         emp.setStatus(updatedEmp.getStatus());
+
         return employeeRepository.save(emp);
     }
 
