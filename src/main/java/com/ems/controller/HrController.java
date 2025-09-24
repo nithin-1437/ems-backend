@@ -12,10 +12,6 @@ import java.util.Random;
 
 @RestController
 @RequestMapping("/api/hr")
-@CrossOrigin(origins = {
-        "http://localhost:5173",  // React dev
-        "http://localhost:9090"   // Frontend deployed in Tomcat / Docker
-})
 public class HrController {
 
     @Autowired
