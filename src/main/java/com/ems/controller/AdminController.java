@@ -10,10 +10,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admins")
-@CrossOrigin(origins = {
-        "http://localhost:5173",  // frontend dev
-        "http://localhost:9090"   // frontend deployed in Tomcat
-})
 public class AdminController {
 
     @Autowired
